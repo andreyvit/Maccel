@@ -1,8 +1,6 @@
 import Cocoa
 import Carbon
 
-//[{"HIDKeyboardModifierMappingSrc":0x700000066,"HIDKeyboardModifierMappingDst":0x700000004}]}'
-
 public enum Key {
     case unknown
 
