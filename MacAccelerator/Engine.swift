@@ -550,7 +550,7 @@ public class Engine {
 
         var isShortPressEvent = false
         if let last = lastEvent, last.state == .down, ev.state == .up, last.comb == ev.comb {
-            if ev.timestamp - last.timestamp < shortPressThreshold {
+            if ev.timestamp > last.timestamp && (ev.timestamp - last.timestamp < shortPressThreshold) {
                 isShortPressEvent = true
             }
         }
