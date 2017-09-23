@@ -49,7 +49,26 @@ public enum Key {
     case letterZ
 
     case digit1
+    case digit2
+    case digit3
+    case digit4
+    case digit5
+    case digit6
+    case digit7
+    case digit8
+    case digit9
     case digit0
+    
+    case lbracket
+    case rbracket
+    case semicolon
+    case apostrophe
+    case backslash
+    case comma
+    case period
+    case slash
+    case minus
+    case equals
 
     case enter
     case escape
@@ -101,27 +120,80 @@ public protocol Action: class {
     func execute(in context: ExecutionContext)
 }
 
+public struct AppRef {
+	
+    public var identifier: String?
+    public var name: String?
+    
+}
+
+public enum BehaviorIfActive {
+    case none
+    case hide
+}
+
 public final class ActivateAppAction: Action {
 
     private let bundleIDs: [String]
-    private let hideIfActive: Bool
+    private let folderNames: [String]
+    private let behaviorIfActive: BehaviorIfActive
+    private var resolvedBundleIDs: [String]?
 
-    public init(bundleIDs: [String], hideIfActive: Bool = false) {
-        precondition(!bundleIDs.isEmpty)
+    public init(bundleIDs: [String] = [], folderNames: [String] = [], ifActive behaviorIfActive: BehaviorIfActive = .none) {
+        precondition(!bundleIDs.isEmpty || !folderNames.isEmpty)
         self.bundleIDs = bundleIDs
-        self.hideIfActive = hideIfActive
+        self.folderNames = folderNames
+        self.behaviorIfActive = behaviorIfActive
     }
 
     public func execute(in context: ExecutionContext) {
-        if hideIfActive {
+        let resolvedBundleIDs: [String]
+        if let ids = self.resolvedBundleIDs {
+            resolvedBundleIDs = ids
+        } else {
+            resolvedBundleIDs = self.resolveBundleIDs()
+            self.resolvedBundleIDs = resolvedBundleIDs
+        }
+        
+        if behaviorIfActive == .hide {
             if let frontApp = NSWorkspace.shared().frontmostApplication, let frontID = frontApp.bundleIdentifier {
-                if bundleIDs.contains(frontID) {
+                if resolvedBundleIDs.contains(frontID) {
                     frontApp.hide()
                     return
                 }
             }
         }
-        NSWorkspace.shared().launchApplication(withBundleIdentifier: bundleIDs[0], options: NSWorkspaceLaunchOptions.default, additionalEventParamDescriptor: nil, launchIdentifier: nil)
+        for bundleID in resolvedBundleIDs {
+            let apps = NSRunningApplication.runningApplications(withBundleIdentifier: bundleID)
+            if !apps.isEmpty {
+                apps.first!.activate(options: .activateIgnoringOtherApps)
+                NSLog("Maccelerator: activated \(bundleID)")
+                return
+            }
+        }
+        for bundleID in resolvedBundleIDs {
+            if NSWorkspace.shared().launchApplication(withBundleIdentifier: bundleID, options: NSWorkspaceLaunchOptions.default, additionalEventParamDescriptor: nil, launchIdentifier: nil) {
+                NSLog("Maccelerator: launched \(bundleID)")
+                return
+            }
+        }
+        NSLog("Maccelerator: could not find any of the applications to launch")
+    }
+    
+    private func resolveBundleIDs() -> [String] {
+        var resolvedBundleIDs: [String] = self.bundleIDs
+        if !folderNames.isEmpty {
+            let applicationsDir = try! FileManager.default.url(for: .applicationDirectory, in: .localDomainMask, appropriateFor: nil, create: true)
+            for folderName in folderNames {
+                let bundleURL = applicationsDir.appendingPathComponent("\(folderName).app", isDirectory: true)
+                if let bundle = Bundle(url: bundleURL) {
+                    if let identifier = bundle.bundleIdentifier {
+                        resolvedBundleIDs.append(identifier)
+                    }
+                }
+            }
+        }
+        return resolvedBundleIDs
     }
 
 }
@@ -289,6 +361,28 @@ public let keyNames: [Key: [String]] = [
     .letterX:     ["x"],
     .letterY:     ["y"],
     .letterZ:     ["z"],
+    
+    .digit1: ["1"],
+    .digit2: ["2"],
+    .digit3: ["3"],
+    .digit4: ["4"],
+    .digit5: ["5"],
+    .digit6: ["6"],
+    .digit7: ["7"],
+    .digit8: ["8"],
+    .digit9: ["9"],
+    .digit0: ["0"],
+
+    .minus: ["minus"],
+    .equals: ["equals"],
+    .lbracket: ["lbracket"],
+    .rbracket: ["rbracket"],
+    .semicolon: ["semicolon"],
+    .apostrophe: ["apostrophe"],
+    .backslash: ["backslash"],
+    .comma: ["comma"],
+    .period: ["period"],
+    .slash: ["slash"],
 
     .enter:       ["enter"],
     .escape:      ["esc", "escape"],
@@ -372,7 +466,6 @@ public let usbCodes: [Key: UInt64] = [
 
 public let cgeventKeyCodesToKeys: [UInt16: Key] = [
     36: .enter,
-    45: .letterN,
     48: .tab,
     49: .space,
     51: .backspace,
@@ -404,6 +497,55 @@ public let cgeventKeyCodesToKeys: [UInt16: Key] = [
     124: .arrowRight,
     125: .arrowDown,
     126: .arrowUp,
+    
+    12: .letterQ,
+    13: .letterW,
+    14: .letterE,
+    15: .letterR,
+    17: .letterT,
+    16: .letterY,
+    32: .letterU,
+    34: .letterI,
+    31: .letterO,
+    35: .letterP,
+    0: .letterA,
+    1: .letterS,
+    2: .letterD,
+    3: .letterF,
+    5: .letterG,
+    4: .letterH,
+    38: .letterJ,
+    40: .letterK,
+    37: .letterL,
+    6: .letterZ,
+    7: .letterX,
+    8: .letterC,
+    9: .letterV,
+    11: .letterB,
+    45: .letterN,
+    46: .letterM,
+    
+    18: .digit1,
+    19: .digit2,
+    20: .digit3,
+    21: .digit4,
+    23: .digit5,
+    22: .digit6,
+    26: .digit7,
+    28: .digit8,
+    25: .digit9,
+    29: .digit0,
+    27: .minus,
+    24: .equals,
+
+    33: .lbracket,
+    30: .rbracket,
+    41: .semicolon,
+    39: .apostrophe,
+    42: .backslash,
+    43: .comma,
+    47: .period,
+    44: .slash,
 ]
 
 public let cgeventKeyCodes: [Key: UInt16] = {
@@ -475,7 +617,21 @@ public class Engine {
     private let shortPressThreshold: UInt64 = 1000000 /* ns in ms */ * 175
 
     private let actions: [KeyComb: Action] = [
-        KeyComb(.letterN, .option): ActivateAppAction(bundleIDs: ["ru.keepcoder.Telegram"], hideIfActive: true),
+        KeyComb(.letterC, .option): ActivateAppAction(folderNames: ["Chrome"], ifActive: .none),
+        KeyComb(.letterE, .option): ActivateAppAction(folderNames: ["Evernote"], ifActive: .hide),
+        KeyComb(.letterW, .option): ActivateAppAction(folderNames: ["FaceTime"], ifActive: .hide),
+        KeyComb(.letterG, .option): ActivateAppAction(folderNames: ["GitHub Desktop"], ifActive: .hide),
+        KeyComb(.letterI, .option): ActivateAppAction(folderNames: ["iTunes"], ifActive: .hide),
+        KeyComb(.letterM, .option): ActivateAppAction(folderNames: ["Messages"], ifActive: .hide),
+        KeyComb(.letterA, .option): ActivateAppAction(folderNames: ["Safari"], ifActive: .none),
+        KeyComb(.letterK, .option): ActivateAppAction(folderNames: ["Sketch"], ifActive: .none),
+        KeyComb(.letterS, .option): ActivateAppAction(folderNames: ["Skype"], ifActive: .hide),
+        KeyComb(.letterL, .option): ActivateAppAction(folderNames: ["Slack"], ifActive: .hide),
+        KeyComb(.letterT, .option): ActivateAppAction(folderNames: ["Sublime Text"], ifActive: .none),
+        KeyComb(.letterZ, .option): ActivateAppAction(folderNames: ["Telegram", "Telegram Desktop"], ifActive: .hide),
+        KeyComb(.letterH, .option): ActivateAppAction(folderNames: ["Things"], ifActive: .hide),
+        KeyComb(.letterX, .option): ActivateAppAction(folderNames: ["Xcode"], ifActive: .none),
+//        KeyComb(.letterX, [.option, .shift]): ActivateAppAction(folderNames: ["iOS Simulator"], ifActive: .hide),
     ]
 
     private let shortPressActions: [KeyComb: Action] = [
