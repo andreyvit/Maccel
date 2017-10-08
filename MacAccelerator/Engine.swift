@@ -548,6 +548,17 @@ public let cgeventKeyCodesToKeys: [UInt16: Key] = [
     44: .slash,
 ]
 
+public let cgeventModifierToMask: [Key: CGEventFlags] = [
+    .lshift: .maskShift,
+    .rshift: .maskShift,
+    .lcontrol: .maskControl,
+    .rcontrol: .maskControl,
+    .loption: .maskAlternate,
+    .roption: .maskAlternate,
+    .lcommand: .maskCommand,
+    .rcommand: .maskCommand,
+]
+
 public let cgeventKeyCodes: [Key: UInt16] = {
     var result: [Key: UInt16] = [:]
     for (code, key) in cgeventKeyCodesToKeys {
@@ -609,6 +620,8 @@ public class Engine {
 
     private var lastEvent: KeyEvent?
 
+    private var suppressModifiers: CGEventFlags = CGEventFlags(rawValue: 0)
+
     private let remappings: [Key: Key] = [
         .lcontrol: .f19,
         .capslock: .rcontrol,
@@ -639,6 +652,12 @@ public class Engine {
         KeyComb(.rcommand, .none): ActivateKeyboardLayoutAction(index: 1),
     ]
 
+    private let keyDownUpActions: [KeyComb: (Action?, Action?)] = [
+        :
+//        KeyComb(.rcommand, .none): (ActivateKeyboardLayoutAction(index: 2),
+//                                    ActivateKeyboardLayoutAction(index: 0)),
+    ]
+
     public func reapply() {
         var remappingPairs: [[String: Any]] = []
         for (src, dst) in remappings {
@@ -666,6 +685,10 @@ public class Engine {
             NSEvent.removeMonitor(eventMonitor)
         }
         eventMonitor = nil
+    }
+
+    private func isSingleModifierKeyComb(_ comb: KeyComb) -> Bool {
+        return cgeventModifierToMask[comb.key] != nil && comb.modifiers == .none
     }
 
     private func handleEvent(_ proxy: OpaquePointer, _ type: CGEventType, _ event: CGEvent) -> Unmanaged<CGEvent>? {
@@ -713,10 +736,39 @@ public class Engine {
         NSLog("%@ (%@)", comb.description + state.description, "\(keyCode)")
         // NSLog("%@", NSEvent(cgEvent: event)!)
 
+        if !suppressModifiers.isEmpty {
+            event.flags.remove(suppressModifiers)
+        }
+
         if isShortPressEvent, let action = shortPressActions[comb] {
             NSLog("Executing %@", "\(action)")
             let context = ExecutionContext()
             action.execute(in: context)
+            return Unmanaged.passUnretained(event)
+        }
+
+        if let downUpAction = keyDownUpActions[comb] {
+            let action = state == .down ? downUpAction.0 : downUpAction.1
+            if isSingleModifierKeyComb(comb) {
+                // Strip modifiers for consequent key passes if there is an action on key down. Don't bother
+                // if the action is only on keyup.
+                if action != nil && state == .down {
+                    suppressModifiers.insert(cgeventModifierToMask[comb.key]!)
+                }
+                // Stop stripping modifiers on keyup
+                if state == .up {
+                    suppressModifiers.remove(cgeventModifierToMask[comb.key]!)
+                }
+            }
+            if action != nil {
+                let context = ExecutionContext()
+                action!.execute(in: context)
+                if let firstEvent = context.events.first {
+                    // TODO: handle the rest of them
+                    return Unmanaged.passUnretained(firstEvent)
+                }
+                return nil
+            }
             return Unmanaged.passUnretained(event)
         }
 
