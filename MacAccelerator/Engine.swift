@@ -692,6 +692,15 @@ public class Engine {
     }
 
     private func handleEvent(_ proxy: OpaquePointer, _ type: CGEventType, _ event: CGEvent) -> Unmanaged<CGEvent>? {
+        if type == .tapDisabledByTimeout {
+            NSLog("event tap disabled by timeout, re-enabling")
+            tap.reenable()
+            return Unmanaged.passUnretained(event)
+        } else if type == .tapDisabledByUserInput {
+            NSLog("event tap disabled by user input")
+            return Unmanaged.passUnretained(event)
+        }
+        
         let keyCode = UInt16(event.getIntegerValueField(CGEventField.keyboardEventKeycode))
         var key = cgeventKeyCodesToKeys[keyCode] ?? .unknown
 

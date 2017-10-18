@@ -21,6 +21,8 @@ typedef CGEventRef _Nullable (^MACCELTapListener)(CGEventTapProxy _Nonnull proxy
 
 @property (nonatomic, readonly) BOOL isActive;
 
+- (void)reenable;
+
 @end
 
 NSString *MACCELGetUnicodeString(CGEventRef event);

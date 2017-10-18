@@ -31,6 +31,7 @@ void MACCELApplyKeyboardRemappings(NSArray<MACCELRemappingPair *> *pairs) {
 
 @implementation EventTap {
     MACCELTapListener _listener;
+    CFMachPortRef _port;
 }
 
 static CGEventRef MACCELEventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void *refcon) {
@@ -52,16 +53,15 @@ static CGEventRef MACCELEventTapFunction(CGEventTapProxy proxy, CGEventType type
 
     CGEventMask keyboardMask = CGEventMaskBit(kCGEventKeyDown) | CGEventMaskBit(kCGEventKeyUp) | CGEventMaskBit(kCGEventFlagsChanged);
 
-    CFMachPortRef port = CGEventTapCreate(kCGAnnotatedSessionEventTap, kCGTailAppendEventTap, kCGEventTapOptionDefault, keyboardMask, (CGEventTapCallBack)MACCELEventTapFunction, (__bridge void *)self);
-    if (!port) {
+    _port = CGEventTapCreate(kCGAnnotatedSessionEventTap, kCGTailAppendEventTap, kCGEventTapOptionDefault, keyboardMask, (CGEventTapCallBack)MACCELEventTapFunction, (__bridge void *)self);
+    if (!_port) {
         NSLog(@"CGEventTapCreate failed");
         return self;
     }
 
-    CFRunLoopSourceRef source = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, port, 0);
+    CFRunLoopSourceRef source = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, _port, 0);
     if (!source) {
         NSLog(@"CFMachPortCreateRunLoopSource failed");
-        CFRelease(port);
         return self;
     }
 
@@ -76,8 +76,19 @@ static CGEventRef MACCELEventTapFunction(CGEventTapProxy proxy, CGEventType type
     return self;
 }
 
+- (void)dealloc {
+    if (_port) {
+        CFRelease(_port);
+        _port = nil;
+    }
+}
+
 - (CGEventRef _Nullable)handleEvent:(CGEventRef)event type:(CGEventType)type proxy:(CGEventTapProxy)proxy {
     return _listener(proxy, type, event);
+}
+
+- (void)reenable {
+    CGEventTapEnable(_port, true);
 }
 
 NSString *MACCELGetUnicodeString(CGEventRef event) {
