@@ -630,7 +630,7 @@ public class Engine {
     private let shortPressThreshold: UInt64 = 1000000 /* ns in ms */ * 175
 
     private let actions: [KeyComb: Action] = [
-        KeyComb(.letterC, .option): ActivateAppAction(folderNames: ["Chrome"], ifActive: .none),
+        KeyComb(.letterC, .option): ActivateAppAction(folderNames: ["Google Chrome"], ifActive: .none),
         KeyComb(.letterE, .option): ActivateAppAction(folderNames: ["Evernote"], ifActive: .hide),
         KeyComb(.letterW, .option): ActivateAppAction(folderNames: ["FaceTime"], ifActive: .hide),
         KeyComb(.letterG, .option): ActivateAppAction(folderNames: ["GitHub Desktop"], ifActive: .hide),
@@ -642,7 +642,7 @@ public class Engine {
         KeyComb(.letterL, .option): ActivateAppAction(folderNames: ["Slack"], ifActive: .hide),
         KeyComb(.letterT, .option): ActivateAppAction(folderNames: ["Sublime Text"], ifActive: .none),
         KeyComb(.letterZ, .option): ActivateAppAction(folderNames: ["Telegram", "Telegram Desktop"], ifActive: .hide),
-        KeyComb(.letterH, .option): ActivateAppAction(folderNames: ["Things"], ifActive: .hide),
+        KeyComb(.letterH, .option): ActivateAppAction(folderNames: ["Things3", "Things"], ifActive: .hide),
         KeyComb(.letterX, .option): ActivateAppAction(folderNames: ["Xcode"], ifActive: .none),
 //        KeyComb(.letterX, [.option, .shift]): ActivateAppAction(folderNames: ["iOS Simulator"], ifActive: .hide),
     ]
