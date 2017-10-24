@@ -642,7 +642,8 @@ public class Engine {
         KeyComb(.letterL, .option): ActivateAppAction(folderNames: ["Slack"], ifActive: .hide),
         KeyComb(.letterT, .option): ActivateAppAction(folderNames: ["Sublime Text"], ifActive: .none),
         KeyComb(.letterZ, .option): ActivateAppAction(folderNames: ["Telegram", "Telegram Desktop"], ifActive: .hide),
-        KeyComb(.letterH, .option): ActivateAppAction(folderNames: ["Things3", "Things"], ifActive: .hide),
+//        KeyComb(.letterH, .option): ActivateAppAction(folderNames: ["Things3", "Things"], ifActive: .hide),
+        KeyComb(.letterH, .option): ActivateAppAction(folderNames: ["OmniFocus"], ifActive: .hide),
         KeyComb(.letterX, .option): ActivateAppAction(folderNames: ["Xcode"], ifActive: .none),
 //        KeyComb(.letterX, [.option, .shift]): ActivateAppAction(folderNames: ["iOS Simulator"], ifActive: .hide),
     ]
