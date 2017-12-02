@@ -76,6 +76,7 @@ public enum Key {
     case space
     case backspace
     case capslock
+    case fn
 
     case lcontrol
     case lshift
@@ -247,6 +248,9 @@ public struct Modifiers: OptionSet, Hashable, CustomStringConvertible {
         if flags.contains(.command) {
             insert(.command)
         }
+        if flags.contains(.function) {
+            insert(.fn)
+        }
     }
 
     public init(flags: CGEventFlags) {
@@ -263,6 +267,9 @@ public struct Modifiers: OptionSet, Hashable, CustomStringConvertible {
         if flags.contains(.maskCommand) {
             insert(.command)
         }
+        if flags.contains(.maskSecondaryFn) {
+            insert(.fn)
+        }
     }
 
     public static func from(key: Key) -> Modifiers {
@@ -271,6 +278,7 @@ public struct Modifiers: OptionSet, Hashable, CustomStringConvertible {
         case .lshift, .rshift:      return .shift
         case .loption, .roption:    return .option
         case .lcommand, .rcommand:  return .command
+        case .fn:                   return .fn
         default:                    return .none
         }
     }
@@ -304,6 +312,7 @@ public struct Modifiers: OptionSet, Hashable, CustomStringConvertible {
     public static let shift = Modifiers(rawValue: 0x02)
     public static let option = Modifiers(rawValue: 0x04)
     public static let command = Modifiers(rawValue: 0x08)
+    public static let fn = Modifiers(rawValue: 0x10)
 
     private static let textualStrings: [Modifiers: String] = {
         var result: [Modifiers: String] = [:]
@@ -316,10 +325,10 @@ public struct Modifiers: OptionSet, Hashable, CustomStringConvertible {
         return result
     }()
 
-    private static let textualNames: [Modifiers: String] = [.command: "command", .control: "ctrl", .option: "option", .shift: "shift"]
-    private static let symbols: [Modifiers: String] = [.command: "⌘", .control: "⌃", .option: "⌥", .shift: "⇧"]
+    private static let textualNames: [Modifiers: String] = [.command: "command", .control: "ctrl", .option: "option", .shift: "shift", .fn: "fn"]
+    private static let symbols: [Modifiers: String] = [.command: "⌘", .control: "⌃", .option: "⌥", .shift: "⇧", .fn: "fn-"]
 
-    private static func buildDescriptions(into map: inout [Modifiers: String], names: [Modifiers: String], separator: String, from state: Modifiers = .none, appending suffixes: [Modifiers] = [.command, .control, .option, .shift], components: [String] = []) {
+    private static func buildDescriptions(into map: inout [Modifiers: String], names: [Modifiers: String], separator: String, from state: Modifiers = .none, appending suffixes: [Modifiers] = [.fn, .command, .control, .option, .shift], components: [String] = []) {
         if suffixes.isEmpty {
             map[state] = components.joined(separator: separator)
         } else {
@@ -390,6 +399,7 @@ public let keyNames: [Key: [String]] = [
     .space:       ["space"],
     .backspace:   ["backspace"],
     .capslock:    ["capslock", "caps"],
+    .fn: ["fn"],
 
     .rcontrol:    ["rctrl"],
     .rshift:      ["rshift"],
@@ -479,6 +489,7 @@ public let cgeventKeyCodesToKeys: [UInt16: Key] = [
     60: .rshift,
     61: .roption,
     62: .rcontrol,
+    63: .fn,
 
     96: .f5,
     97: .f6,
@@ -711,6 +722,8 @@ public class Engine {
         if type == .flagsChanged {
             var modifiers = Modifiers(flags: event.flags)
             let keyModifier = Modifiers.from(key: key)
+//            let nsevnt = NSEvent(cgEvent: event)!
+//            NSLog("%@", "flagsChanged: CGEventFlags = \(event.flags) (\(modifiers)), NSEventModifierFlags = \(nsevnt.modifierFlags) (\(Modifiers(flags: nsevnt.modifierFlags)))")
             if modifiers.contains(keyModifier) {
                 state = .down
                 modifiers.remove(keyModifier)
