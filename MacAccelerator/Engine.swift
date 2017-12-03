@@ -122,10 +122,11 @@ public class ExecutionContext {
     }
 
     func send(_ comb: KeyComb) {
-//        for key in comb.modifiers.keys {
-//
-//        }
-//        CGEvent.init(keyboardEventSource: <#T##CGEventSource?#>, virtualKey: <#T##CGKeyCode#>, keyDown: <#T##Bool#>)
+        if let events = comb.cgEvents(using: eventSource) {
+            self.events.append(contentsOf: events)
+        } else {
+            NSLog("Cannot simulate keypress of %@", comb.description)
+        }
     }
 
 }
@@ -235,6 +236,7 @@ public final class SendCombAction: Action {
     }
 
     public func execute(in context: ExecutionContext) {
+        context.send(comb)
     }
 
 }
@@ -312,6 +314,26 @@ public struct Modifiers: OptionSet, Hashable, CustomStringConvertible {
         }
         if contains(.option) {
             result.append(.loption)
+        }
+        return result
+    }
+
+    var cgEventFlags: CGEventFlags {
+        var result: CGEventFlags = []
+        if contains(.fn) {
+            result.insert(.maskSecondaryFn)
+        }
+        if contains(.command) {
+            result.insert(.maskCommand)
+        }
+        if contains(.control) {
+            result.insert(.maskControl)
+        }
+        if contains(.shift) {
+            result.insert(.maskShift)
+        }
+        if contains(.option) {
+            result.insert(.maskAlternate)
         }
         return result
     }
@@ -603,6 +625,7 @@ public let cgeventModifierToMask: [Key: CGEventFlags] = [
     .roption: .maskAlternate,
     .lcommand: .maskCommand,
     .rcommand: .maskCommand,
+    .fn: .maskSecondaryFn,
 ]
 
 public let cgeventKeyCodes: [Key: UInt16] = {
@@ -640,6 +663,44 @@ public struct KeyComb: CustomStringConvertible, Hashable {
 
     public static func ==(lhs: KeyComb, rhs: KeyComb) -> Bool {
         return (lhs.key == rhs.key) && (lhs.modifiers == rhs.modifiers)
+    }
+
+    public func keyCombsForEventSimulation() -> [KeyComb] {
+        var combs: [KeyComb] = []
+        var activeModifiers: Modifiers = .none
+        for key in modifiers.keys {
+            combs.append(KeyComb(key, activeModifiers))
+            activeModifiers.insert(Modifiers.from(key: key))
+        }
+        combs.append(self)
+        return combs
+    }
+
+    func cgEvent(down: Bool, using eventSource: CGEventSource) -> CGEvent? {
+        guard let keyCode = cgeventKeyCodes[key] else {
+            return nil
+        }
+        let event = CGEvent(keyboardEventSource: eventSource, virtualKey: keyCode, keyDown: down)!
+        event.flags = modifiers.cgEventFlags
+        return event
+    }
+
+    func cgEvents(using eventSource: CGEventSource) -> [CGEvent]? {
+        let subcombs = keyCombsForEventSimulation()
+        var events: [CGEvent] = []
+        for subcomb in subcombs {
+            guard let event = subcomb.cgEvent(down: true, using: eventSource) else {
+                return nil
+            }
+            events.append(event)
+        }
+        for subcomb in subcombs.reversed() {
+            guard let event = subcomb.cgEvent(down: false, using: eventSource) else {
+                return nil
+            }
+            events.append(event)
+        }
+        return events
     }
 
 }
@@ -692,6 +753,7 @@ public class Engine {
         KeyComb(.letterH, .option): ActivateAppAction(folderNames: ["OmniFocus"], ifActive: .hide),
         KeyComb(.letterX, .option): ActivateAppAction(folderNames: ["Xcode"], ifActive: .none),
 //        KeyComb(.letterX, [.option, .shift]): ActivateAppAction(folderNames: ["iOS Simulator"], ifActive: .hide),
+        KeyComb(.letterT, .fn): SendCombAction(KeyComb(.letterX, .shift)),
     ]
 
     private let shortPressActions: [KeyComb: Action] = [
@@ -740,7 +802,7 @@ public class Engine {
         return cgeventModifierToMask[comb.key] != nil && comb.modifiers == .none
     }
 
-    private func handleEvent(_ proxy: OpaquePointer, _ type: CGEventType, _ event: CGEvent) -> Unmanaged<CGEvent>? {
+    private func handleEvent(_ proxy: CGEventTapProxy?, _ type: CGEventType, _ event: CGEvent) -> Unmanaged<CGEvent>? {
         if type == .tapDisabledByTimeout {
             NSLog("event tap disabled by timeout, re-enabling")
             tap.reenable()
@@ -829,6 +891,9 @@ public class Engine {
 
             let context = ExecutionContext(eventSource: eventSource)
             action.execute(in: context)
+            for event in context.events {
+                event.tapPostEvent(proxy)
+            }
 //            if let firstEvent = context.events.first {
 //                // TODO: handle the rest of them
 //                return Unmanaged.passUnretained(firstEvent)
