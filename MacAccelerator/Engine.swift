@@ -113,7 +113,20 @@ public enum KeyStringStyle {
 
 public class ExecutionContext {
 
+    private let eventSource: CGEventSource
+
     fileprivate var events: [CGEvent] = []
+
+    fileprivate init(eventSource: CGEventSource) {
+        self.eventSource = eventSource
+    }
+
+    func send(_ comb: KeyComb) {
+//        for key in comb.modifiers.keys {
+//
+//        }
+//        CGEvent.init(keyboardEventSource: <#T##CGEventSource?#>, virtualKey: <#T##CGKeyCode#>, keyDown: <#T##Bool#>)
+    }
 
 }
 
@@ -283,6 +296,26 @@ public struct Modifiers: OptionSet, Hashable, CustomStringConvertible {
         }
     }
 
+    public var keys: [Key] {
+        var result: [Key] = []
+        if contains(.fn) {
+            result.append(.fn)
+        }
+        if contains(.command) {
+            result.append(.lcommand)
+        }
+        if contains(.control) {
+            result.append(.lcontrol)
+        }
+        if contains(.shift) {
+            result.append(.lshift)
+        }
+        if contains(.option) {
+            result.append(.loption)
+        }
+        return result
+    }
+
     public func string(_ style: KeyStringStyle) -> String {
         switch style {
         case .textual: return textualString
@@ -314,6 +347,8 @@ public struct Modifiers: OptionSet, Hashable, CustomStringConvertible {
     public static let command = Modifiers(rawValue: 0x08)
     public static let fn = Modifiers(rawValue: 0x10)
 
+    public static let all: [Modifiers] = [.fn, .command, .control, .option, .shift]
+
     private static let textualStrings: [Modifiers: String] = {
         var result: [Modifiers: String] = [:]
         buildDescriptions(into: &result, names: textualNames, separator: "-")
@@ -328,7 +363,7 @@ public struct Modifiers: OptionSet, Hashable, CustomStringConvertible {
     private static let textualNames: [Modifiers: String] = [.command: "command", .control: "ctrl", .option: "option", .shift: "shift", .fn: "fn"]
     private static let symbols: [Modifiers: String] = [.command: "⌘", .control: "⌃", .option: "⌥", .shift: "⇧", .fn: "fn-"]
 
-    private static func buildDescriptions(into map: inout [Modifiers: String], names: [Modifiers: String], separator: String, from state: Modifiers = .none, appending suffixes: [Modifiers] = [.fn, .command, .control, .option, .shift], components: [String] = []) {
+    private static func buildDescriptions(into map: inout [Modifiers: String], names: [Modifiers: String], separator: String, from state: Modifiers = .none, appending suffixes: [Modifiers] = Modifiers.all, components: [String] = []) {
         if suffixes.isEmpty {
             map[state] = components.joined(separator: separator)
         } else {
@@ -670,6 +705,8 @@ public class Engine {
 //                                    ActivateKeyboardLayoutAction(index: 0)),
     ]
 
+    private let eventSource = CGEventSource(stateID: CGEventSourceStateID.combinedSessionState)!
+
     public func reapply() {
         var remappingPairs: [[String: Any]] = []
         for (src, dst) in remappings {
@@ -763,19 +800,16 @@ public class Engine {
             event.flags.remove(suppressModifiers)
         }
 
-        if isShortPressEvent, let action = shortPressActions[comb] {
-            NSLog("Executing %@", "\(action)")
-            let context = ExecutionContext()
-            action.execute(in: context)
-            return Unmanaged.passUnretained(event)
-        }
+        var actionToPerform: Action? = nil
 
-        if let downUpAction = keyDownUpActions[comb] {
-            let action = state == .down ? downUpAction.0 : downUpAction.1
+        if isShortPressEvent, let action = shortPressActions[comb] {
+            actionToPerform = action
+        } else if let downUpAction = keyDownUpActions[comb] {
+            actionToPerform = (state == .down ? downUpAction.0 : downUpAction.1)
             if isSingleModifierKeyComb(comb) {
                 // Strip modifiers for consequent key passes if there is an action on key down. Don't bother
                 // if the action is only on keyup.
-                if action != nil && state == .down {
+                if state == .down && downUpAction.0 != nil {
                     suppressModifiers.insert(cgeventModifierToMask[comb.key]!)
                 }
                 // Stop stripping modifiers on keyup
@@ -783,32 +817,23 @@ public class Engine {
                     suppressModifiers.remove(cgeventModifierToMask[comb.key]!)
                 }
             }
-            if action != nil {
-                let context = ExecutionContext()
-                action!.execute(in: context)
-                if let firstEvent = context.events.first {
-                    // TODO: handle the rest of them
-                    return Unmanaged.passUnretained(firstEvent)
-                }
-                return nil
-            }
-            return Unmanaged.passUnretained(event)
-        }
-
-        if let action = actions[comb] {
-            NSLog("Executing %@", "\(action)")
-
+        } else if let action = actions[comb] {
             if state == .up || repeatCount > 0 {
                 return nil
             }
-            let context = ExecutionContext()
+            actionToPerform = action
+        }
+
+        if let action = actionToPerform {
+            NSLog("Executing %@", "\(action)")
+
+            let context = ExecutionContext(eventSource: eventSource)
             action.execute(in: context)
-            if let firstEvent = context.events.first {
-                // TODO: handle the rest of them
-                return Unmanaged.passUnretained(firstEvent)
-            } else {
-                return nil
-            }
+//            if let firstEvent = context.events.first {
+//                // TODO: handle the rest of them
+//                return Unmanaged.passUnretained(firstEvent)
+//            }
+            return nil
         }
 
         return Unmanaged.passUnretained(event)
