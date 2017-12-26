@@ -102,15 +102,17 @@ NSString *MACCELGetUnicodeString(CGEventRef event) {
     return [NSString stringWithCharacters:buf length:len];
 }
 
-BOOL MACCELSelectInputSource(NSInteger sourceIndex) {
+BOOL MACCELSelectInputSource(NSString *sourceID) {
     NSArray *sources = (__bridge_transfer NSArray *)TISCreateInputSourceList(nil, false);
     NSInteger idx = 0;
     BOOL ok = NO;
     for (id source in sources) {
-        NSString *sourceID = (__bridge NSString *) (CFStringRef)TISGetInputSourceProperty((__bridge TISInputSourceRef)source, kTISPropertyInputSourceID);
-        NSLog(@"Source %ld: %@ (%@)", (long)idx, sourceID, source);
+        NSString *candidateID = (__bridge NSString *) (CFStringRef)TISGetInputSourceProperty((__bridge TISInputSourceRef)source, kTISPropertyInputSourceID);
+        NSString *cat = (__bridge NSString *) (CFStringRef)TISGetInputSourceProperty((__bridge TISInputSourceRef)source, kTISPropertyInputSourceCategory);
+        NSString *type = (__bridge NSString *) (CFStringRef)TISGetInputSourceProperty((__bridge TISInputSourceRef)source, kTISPropertyInputSourceType);
+        NSLog(@"Source %ld: %@ (category %@, type %@) - %@", (long)idx, candidateID, cat, type, source);
 
-        if (idx == sourceIndex) {
+        if ([candidateID isEqualToString:sourceID]) {
             OSStatus status = TISSelectInputSource((__bridge TISInputSourceRef)source);
             if (status == noErr) {
                 ok = true;

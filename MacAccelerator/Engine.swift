@@ -215,14 +215,14 @@ public final class ActivateAppAction: Action {
 
 public final class ActivateKeyboardLayoutAction: Action {
 
-    private let index: Int
+    private let sourceID: String
 
-    public init(index: Int) {
-        self.index = index
+    public init(sourceID: String) {
+        self.sourceID = sourceID
     }
 
     public func execute(in context: ExecutionContext) {
-        MACCELSelectInputSource(index)
+        MACCELSelectInputSource(sourceID)
     }
     
 }
@@ -757,8 +757,8 @@ public class Engine {
     ]
 
     private let shortPressActions: [KeyComb: Action] = [
-        KeyComb(.lcommand, .none): ActivateKeyboardLayoutAction(index: 0),
-        KeyComb(.rcommand, .none): ActivateKeyboardLayoutAction(index: 1),
+        KeyComb(.lcommand, .none): ActivateKeyboardLayoutAction(sourceID: "com.apple.keylayout.ABC"),
+        KeyComb(.rcommand, .none): ActivateKeyboardLayoutAction(sourceID: "com.apple.keylayout.RussianWin"),
     ]
 
     private let keyDownUpActions: [KeyComb: (Action?, Action?)] = [

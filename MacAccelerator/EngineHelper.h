@@ -27,7 +27,7 @@ typedef CGEventRef _Nullable (^MACCELTapListener)(CGEventTapProxy _Nonnull proxy
 
 NSString *MACCELGetUnicodeString(CGEventRef event);
 
-BOOL MACCELSelectInputSource(NSInteger sourceIndex);
+BOOL MACCELSelectInputSource(NSString *sourceID);
 
 CF_IMPLICIT_BRIDGING_DISABLED
 NS_ASSUME_NONNULL_END
