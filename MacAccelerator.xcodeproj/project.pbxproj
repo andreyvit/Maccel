@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2D7EF9891FF25D74007D352C /* ConfigurationWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D7EF9871FF25D74007D352C /* ConfigurationWindowController.swift */; };
+		2D7EF98A1FF25D74007D352C /* ConfigurationWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2D7EF9881FF25D74007D352C /* ConfigurationWindowController.xib */; };
 		434338741F6D5BC00037E851 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 434338731F6D5BC00037E851 /* AppDelegate.swift */; };
 		434338761F6D5BC00037E851 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 434338751F6D5BC00037E851 /* ViewController.swift */; };
 		434338781F6D5BC00037E851 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 434338771F6D5BC00037E851 /* Assets.xcassets */; };
@@ -16,6 +18,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		2D7EF9871FF25D74007D352C /* ConfigurationWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigurationWindowController.swift; sourceTree = "<group>"; };
+		2D7EF9881FF25D74007D352C /* ConfigurationWindowController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ConfigurationWindowController.xib; sourceTree = "<group>"; };
 		434338701F6D5BC00037E851 /* MacAccelerator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MacAccelerator.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		434338731F6D5BC00037E851 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		434338751F6D5BC00037E851 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -67,6 +71,8 @@
 				434338791F6D5BC00037E851 /* Main.storyboard */,
 				4343387C1F6D5BC00037E851 /* Info.plist */,
 				434338841F6D64CD0037E851 /* MacAccelerator-Bridging-Header.h */,
+				2D7EF9871FF25D74007D352C /* ConfigurationWindowController.swift */,
+				2D7EF9881FF25D74007D352C /* ConfigurationWindowController.xib */,
 			);
 			path = MacAccelerator;
 			sourceTree = "<group>";
@@ -134,6 +140,7 @@
 			files = (
 				434338781F6D5BC00037E851 /* Assets.xcassets in Resources */,
 				4343387B1F6D5BC00037E851 /* Main.storyboard in Resources */,
+				2D7EF98A1FF25D74007D352C /* ConfigurationWindowController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -146,6 +153,7 @@
 			files = (
 				434338761F6D5BC00037E851 /* ViewController.swift in Sources */,
 				434338831F6D5CEA0037E851 /* Engine.swift in Sources */,
+				2D7EF9891FF25D74007D352C /* ConfigurationWindowController.swift in Sources */,
 				434338741F6D5BC00037E851 /* AppDelegate.swift in Sources */,
 				434338871F6D64CD0037E851 /* EngineHelper.m in Sources */,
 			);
@@ -309,6 +317,7 @@
 				434338811F6D5BC00037E851 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
