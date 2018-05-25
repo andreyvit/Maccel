@@ -20,7 +20,7 @@
 /* Begin PBXFileReference section */
 		2D7EF9871FF25D74007D352C /* ConfigurationWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigurationWindowController.swift; sourceTree = "<group>"; };
 		2D7EF9881FF25D74007D352C /* ConfigurationWindowController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ConfigurationWindowController.xib; sourceTree = "<group>"; };
-		434338701F6D5BC00037E851 /* MacAccelerator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MacAccelerator.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		434338701F6D5BC00037E851 /* Maccel.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Maccel.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		434338731F6D5BC00037E851 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		434338751F6D5BC00037E851 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		434338771F6D5BC00037E851 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -54,7 +54,7 @@
 		434338711F6D5BC00037E851 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				434338701F6D5BC00037E851 /* MacAccelerator.app */,
+				434338701F6D5BC00037E851 /* Maccel.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -80,9 +80,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		4343386F1F6D5BC00037E851 /* MacAccelerator */ = {
+		4343386F1F6D5BC00037E851 /* Maccel */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 4343387F1F6D5BC00037E851 /* Build configuration list for PBXNativeTarget "MacAccelerator" */;
+			buildConfigurationList = 4343387F1F6D5BC00037E851 /* Build configuration list for PBXNativeTarget "Maccel" */;
 			buildPhases = (
 				4343386C1F6D5BC00037E851 /* Sources */,
 				4343386D1F6D5BC00037E851 /* Frameworks */,
@@ -92,9 +92,9 @@
 			);
 			dependencies = (
 			);
-			name = MacAccelerator;
+			name = Maccel;
 			productName = MacAccelerator;
-			productReference = 434338701F6D5BC00037E851 /* MacAccelerator.app */;
+			productReference = 434338701F6D5BC00037E851 /* Maccel.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -128,7 +128,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				4343386F1F6D5BC00037E851 /* MacAccelerator */,
+				4343386F1F6D5BC00037E851 /* Maccel */,
 			);
 		};
 /* End PBXProject section */
@@ -274,7 +274,7 @@
 				DEVELOPMENT_TEAM = D963M2VVCH;
 				INFOPLIST_FILE = MacAccelerator/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.tarantsov.MacAccelerator;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tarantsov.Maccel;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "MacAccelerator/MacAccelerator-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -291,7 +291,7 @@
 				DEVELOPMENT_TEAM = D963M2VVCH;
 				INFOPLIST_FILE = MacAccelerator/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.tarantsov.MacAccelerator;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tarantsov.Maccel;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "MacAccelerator/MacAccelerator-Bridging-Header.h";
 				SWIFT_VERSION = 3.0;
@@ -310,7 +310,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		4343387F1F6D5BC00037E851 /* Build configuration list for PBXNativeTarget "MacAccelerator" */ = {
+		4343387F1F6D5BC00037E851 /* Build configuration list for PBXNativeTarget "Maccel" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				434338801F6D5BC00037E851 /* Debug */,
