@@ -171,7 +171,7 @@ public final class ActivateAppAction: Action {
         }
         
         if behaviorIfActive == .hide {
-            if let frontApp = NSWorkspace.shared().frontmostApplication, let frontID = frontApp.bundleIdentifier {
+            if let frontApp = NSWorkspace.shared.frontmostApplication, let frontID = frontApp.bundleIdentifier {
                 if resolvedBundleIDs.contains(frontID) {
                     frontApp.hide()
                     return
@@ -187,7 +187,7 @@ public final class ActivateAppAction: Action {
             }
         }
         for bundleID in resolvedBundleIDs {
-            if NSWorkspace.shared().launchApplication(withBundleIdentifier: bundleID, options: NSWorkspaceLaunchOptions.default, additionalEventParamDescriptor: nil, launchIdentifier: nil) {
+            if NSWorkspace.shared.launchApplication(withBundleIdentifier: bundleID, options: NSWorkspace.LaunchOptions.default, additionalEventParamDescriptor: nil, launchIdentifier: nil) {
                 NSLog("Maccelerator: launched \(bundleID)")
                 return
             }
@@ -249,7 +249,7 @@ public struct Modifiers: OptionSet, Hashable, CustomStringConvertible {
         self.rawValue = rawValue
     }
 
-    public init(flags: NSEventModifierFlags) {
+    public init(flags: NSEvent.ModifierFlags) {
         self.init(rawValue: 0)
         if flags.contains(.control) {
             insert(.control)
@@ -655,10 +655,6 @@ public struct KeyComb: CustomStringConvertible, Hashable {
             k = "\(key)"  // emergency fallback, should never happen
         }
         return m + k
-    }
-
-    public var hashValue: Int {
-        return key.hashValue ^ modifiers.hashValue
     }
 
     public static func ==(lhs: KeyComb, rhs: KeyComb) -> Bool {
