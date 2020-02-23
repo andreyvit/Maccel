@@ -733,10 +733,10 @@ public class Engine {
     private let shortPressThreshold: UInt64 = 1000000 /* ns in ms */ * 175
 
     private let actions: [KeyComb: Action] = [
-        KeyComb(.letterC, .option): ActivateAppAction(folderNames: ["Google Chrome"], ifActive: .none),
-        KeyComb(.letterE, .option): ActivateAppAction(folderNames: ["Evernote"], ifActive: .hide),
-        KeyComb(.letterW, .option): ActivateAppAction(folderNames: ["FaceTime"], ifActive: .hide),
-        KeyComb(.letterG, .option): ActivateAppAction(folderNames: ["GitHub Desktop"], ifActive: .hide),
+        //KeyComb(.letterC, .option): ActivateAppAction(folderNames: ["Google Chrome"], ifActive: .none),
+        //KeyComb(.letterE, .option): ActivateAppAction(folderNames: ["Evernote"], ifActive: .hide),
+        //KeyComb(.letterW, .option): ActivateAppAction(folderNames: ["FaceTime"], ifActive: .hide),
+        //KeyComb(.letterG, .option): ActivateAppAction(folderNames: ["GitHub Desktop"], ifActive: .hide),
         KeyComb(.letterI, .option): ActivateAppAction(folderNames: ["iTunes"], ifActive: .hide),
         KeyComb(.letterM, .option): ActivateAppAction(folderNames: ["Messages"], ifActive: .hide),
         KeyComb(.letterA, .option): ActivateAppAction(folderNames: ["Safari"], ifActive: .none),
@@ -749,6 +749,7 @@ public class Engine {
         KeyComb(.letterH, .option): ActivateAppAction(folderNames: ["OmniFocus"], ifActive: .hide),
         KeyComb(.letterX, .option): ActivateAppAction(folderNames: ["Xcode"], ifActive: .none),
         KeyComb(.letterD, .option): ActivateAppAction(folderNames: ["Discord"], ifActive: .hide),
+        KeyComb(.letterV, .option): ActivateAppAction(folderNames: ["Visual Studio Code"], ifActive: .none),
 //        KeyComb(.letterX, [.option, .shift]): ActivateAppAction(folderNames: ["iOS Simulator"], ifActive: .hide),
         KeyComb(.letterT, .fn): SendCombAction(KeyComb(.letterX, .shift)),
     ]
